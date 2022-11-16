@@ -1,12 +1,16 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
 
     public float speed;
-    
+    public float speedup;
+    public bool isOnGround = true;
+    [SerializeField] public float packman; 
 
     Rigidbody rb;
 
@@ -19,7 +23,7 @@ public class PlayerMovement : MonoBehaviour
    
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space) && isOnGround)
         {
             RigidbodyJump();
         }
@@ -33,7 +37,32 @@ public class PlayerMovement : MonoBehaviour
     }
     private void RigidbodyJump()
     {
-        rb.AddForce(Vector3.up * speed, ForceMode.VelocityChange);
+        rb.AddForce(Vector3.up * speedup, ForceMode.Impulse);
+        isOnGround = false;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Ground"))
+        {
+            isOnGround = true;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other) 
+    {
+        if(this.CompareTag("Player") && other.CompareTag("Finish"))
+        {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        }
+
+        if (this.CompareTag("Player") && other.CompareTag("packman"))
+        {
+            packman++;
+            Destroy(other.gameObject);
+
+        }
+
     }
 
 }
